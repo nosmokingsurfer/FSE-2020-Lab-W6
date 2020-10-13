@@ -671,9 +671,9 @@ class AsymptomaticSick(State):
 
     def night_actions(self):
         self.person.position = self.person.home_position
+        self.days_sick += 1
         if self.days_sick == AsymptomaticSick.DAYS_SICK_TO_FEEL_BAD:
             self.person.set_state(SymptomaticSick(self.person))
-        self.days_sick += 1
 
     def interact(self, other):
         other.get_infected(self.person.virus)

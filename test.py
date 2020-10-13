@@ -93,14 +93,14 @@ class InfectedContactsAntibodies_1(unittest.TestCase):
         del self.persons
 
     def test(self):
-        # first and second person interacting
+        # first and second person interacting - state should not change
         before = self.persons[0].state
         self.persons[0].interact(self.persons[1])
         self.persons[1].interact(self.persons[0])
         after = self.persons[0].state
         self.assertEqual(before, after)
 
-        # first and third person interacting
+        # first and third person interacting - state should change
         before = self.persons[0].state
         self.persons[0].interact(self.persons[2])
         self.persons[2].interact(self.persons[0])
@@ -110,6 +110,24 @@ class InfectedContactsAntibodies_1(unittest.TestCase):
 
 # 4. A person shall change his health state from infected (without symptoms) to infected (with symptoms), 
 # after being infected for 2 days.
+class DAYS_SICK_TO_FEEL_BAD_test(unittest.TestCase):
+    def setUp(self):
+        self.person = generator_randomized_persons(1)[0]
+        self.person.get_infected(cs.get_infectable(cs.InfectableType.SeasonalFlu))
+
+    def tearDown(self):
+        del self.person
+
+    def test(self):
+        self.assertTrue(isinstance(self.person.state, cs.AsymptomaticSick))
+
+        self.person.day_actions()
+        self.person.night_actions()
+
+        self.person.day_actions()
+        self.person.night_actions()
+
+        self.assertTrue(isinstance(self.person.state,cs.SymptomaticSick))
 
 
 if __name__ == "__main__":
