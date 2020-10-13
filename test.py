@@ -31,6 +31,9 @@ def generator_randomized_persons(n_persons, infect_flag=False):
     return persons
 
 
+# 1. Persons should be able to transmit infections when infected (without symptoms or with symptoms), 
+# meaning that other Persons shall be able to get infected (change their health state from healthy to 
+# infected (without symptoms) when contacted by a person with a virus).
 class GettingInfectedTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -49,6 +52,7 @@ class GettingInfectedTestCase(unittest.TestCase):
         del self.persons
 
 
+# 2. When a healthy person is contacting another healthy person, their health conditions should not change.
 class HealthyContactTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -66,6 +70,46 @@ class HealthyContactTestCase(unittest.TestCase):
 
     def tearDown(self):
         del self.persons
+
+
+# 3. When an infected person is contacting a person with antibodies, the latter shall not change health state,
+# if his antibodies have the same type as the virus.
+class InfectedContactsAntibodies_1(unittest.TestCase):
+
+    def setUp(self):
+        self.persons = generator_randomized_persons(3)
+
+        # first person already recovered from SARSCoV2
+        self.persons[0].get_infected(cs.get_infectable(cs.InfectableType.SARSCoV2))
+        self.persons[0].go_to_normal()
+
+        # second person is infected by SARSCoV2
+        self.persons[1].get_infected(cs.get_infectable(cs.InfectableType.SARSCoV2))
+
+        # third person is infected bu SeasonalFlue
+        self.persons[2].get_infected(cs.get_infectable(cs.InfectableType.SeasonalFlu))
+        
+    def tearDown(self):
+        del self.persons
+
+    def test(self):
+        # first and second person interacting
+        before = self.persons[0].state
+        self.persons[0].interact(self.persons[1])
+        self.persons[1].interact(self.persons[0])
+        after = self.persons[0].state
+        self.assertEqual(before, after)
+
+        # first and third person interacting
+        before = self.persons[0].state
+        self.persons[0].interact(self.persons[2])
+        self.persons[2].interact(self.persons[0])
+        after = self.persons[0].state
+        self.assertNotEqual(before, after)
+
+
+# 4. A person shall change his health state from infected (without symptoms) to infected (with symptoms), 
+# after being infected for 2 days.
 
 
 if __name__ == "__main__":

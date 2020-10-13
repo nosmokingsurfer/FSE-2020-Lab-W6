@@ -129,6 +129,13 @@ class Person:
         self.temperature = 36.6
         self.water = self.weight*0.6
 
+        self.hospitalized = False
+        self.set_state(Healthy(self))
+        self.antibody_types.add(self.virus.get_type())
+        self.recovered  =True
+        self.virus=None
+        
+
     
     def is_close_to(self, other):
         return self.position == other.position
@@ -244,11 +251,6 @@ class Hospital:
 
         if patient.virus.strength <= 0:
             patient.go_to_normal()
-            patient.hospitalized = False
-            patient.set_state(Healthy(patient))
-            patient.antibody_types.add(patient.virus.get_type())
-            patient.recovered  =True
-            patient.virus=None
             self.capacity += 1
 
     def treat_patients(self, patients):
