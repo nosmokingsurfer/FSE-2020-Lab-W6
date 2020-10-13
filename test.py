@@ -119,7 +119,7 @@ class DAYS_SICK_TO_FEEL_BAD_test(unittest.TestCase):
         del self.person
 
     def test(self):
-        self.assertTrue(isinstance(self.person.state, cs.AsymptomaticSick))
+        self.assertIsInstance(self.person.state, cs.AsymptomaticSick)
 
         self.person.day_actions()
         self.person.night_actions()
@@ -127,7 +127,7 @@ class DAYS_SICK_TO_FEEL_BAD_test(unittest.TestCase):
         self.person.day_actions()
         self.person.night_actions()
 
-        self.assertTrue(isinstance(self.person.state,cs.SymptomaticSick))
+        self.assertIsInstance(self.person.state,cs.SymptomaticSick)
 
 
 if __name__ == "__main__":
