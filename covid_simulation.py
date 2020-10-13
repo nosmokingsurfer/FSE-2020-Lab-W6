@@ -11,10 +11,6 @@ import pandas as pd
 
 import tqdm
 
-
-min_i, max_i = 0, 100
-min_j, max_j = 0, 100
-
 class Person: pass
 
 class Infectable(ABC):
@@ -81,7 +77,7 @@ class Person:
     LIFE_THREATENING_TEMPERATURE = 40.0
     LIFE_THREATENING_WATER_PCT = 0.5
     
-    def __init__(self, home_position=(0, 0), age=30, weight=70):
+    def __init__(self, home_position=(0, 0), age=30, weight=70, limits = {"min_i" : 0, "max_i": 100, "min_j":0, "max_j":100}):
         self.virus = None
         self.antibody_types = set()
         self.temperature = 36.6
@@ -91,6 +87,11 @@ class Person:
         self.home_position = home_position
         self.position = home_position
         self.state = Healthy(self)
+
+        self.min_i = limits["min_i"]
+        self.max_i = limits["max_i"]
+        self.min_j = limits["min_j"]
+        self.max_j = limits["max_j"]
 
         # bools for stats
 
@@ -154,7 +155,7 @@ class Person:
 
 class DefaultPerson(Person):
     def day_actions(self):
-        self.position = (randint(min_j, max_j), randint(min_i, max_i))
+        self.position = (randint(self.min_j, self.max_j), randint(self.min_i, self.max_i))
         self.state.day_actions()
 
 
@@ -187,6 +188,8 @@ class DefaultPersonFactory(AbstractPersonFactory):
             home_position=(randint(self.min_j, self.max_j), randint(self.min_i, self.max_i)),
             age=randint(self.min_age, self.max_age),
             weight=randint(self.min_weight, self.max_weight),
+            limits={'min_i':self.min_i, 'max_i':self.max_i, 'min_j':self.min_j, 'max_j':self.max_j}
+
         )
 
 
@@ -639,7 +642,7 @@ class Healthy(State):
 
     def day_actions(self):
         # different for CommunityPerson?!
-        self.person.position = (randint(min_j, max_j), randint(min_i, max_i))
+        self.person.position = (randint(self.person.min_j, self.person.max_j), randint(self.person.min_i, self.person.max_i))
 
     def night_actions(self):
         self.person.position = self.person.home_position
@@ -662,7 +665,7 @@ class AsymptomaticSick(State):
 
     def day_actions(self):
         # different for CommunityPerson?!
-        self.person.position = (randint(min_j, max_j), randint(min_i, max_i))
+        self.person.position = (randint(self.person.min_j, self.person.max_j), randint(self.person.min_i, self.person.max_i))
 
     def night_actions(self):
         self.person.position = self.person.home_position
@@ -718,6 +721,8 @@ class Dead(State):
     def interact(self, other): pass
 
     def get_infected(self, virus): pass
+
+
 
 
 
