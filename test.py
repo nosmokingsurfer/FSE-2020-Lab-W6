@@ -130,5 +130,49 @@ class DAYS_SICK_TO_FEEL_BAD_test(unittest.TestCase):
         self.assertIsInstance(self.person.state,cs.SymptomaticSick)
 
 
+#5. A person shall change his health state from infected (with symptoms) to healthy, if the virus has obtained strength below zero.
+
+class ChangeStateToHealthyTestCase(unittest.TestCase):
+    def setUp(self):
+        self.persons = []
+        self.persons = generator_randomized_persons(1)
+        self.persons[0].get_infected(cs.get_infectable(cs.InfectableType.Cholera))
+        self.persons[0].set_state(cs.SymptomaticSick(self.persons[0]))
+        self.persons[0].virus = cs.Cholera(0.00001) 
+
+    def tearDown(self):
+        del self.persons
+        
+    def test(self):
+        self.persons[0].night_actions()
+        self.assertEqual(self.persons[0].state.__class__.__name__,'Healthy')
+
+#6. A person shall change his health state from infected (with symptoms) to dead, if his health state (temperature or water level) is exceeding a life incompatible threshold.
+
+class ChangeStateToDeadTestCase(unittest.TestCase):
+    def setUp(self):
+        self.persons = []
+        self.persons = generator_randomized_persons(2, infect_flag=True)
+        self.persons[0].set_state(cs.SymptomaticSick(self.persons[0]))
+        self.persons[1].set_state(cs.SymptomaticSick(self.persons[1]))
+        self.persons[0].temperature = 100
+        self.persons[1].water = 1
+        self.persons[1].weight = 100
+        n_hospitals = 4
+        hospitals = cs.create_hospitals(n_hospitals)
+        health_dept = cs.create_department_of_health(hospitals)
+           
+    def tearDown(self):
+        del self.persons
+
+    def test(self):
+        self.persons[0].day_actions()
+        self.persons[1].day_actions()
+        self.assertEqual(self.persons[0].state.__class__.__name__,'Dead')
+        self.assertEqual(self.persons[1].state.__class__.__name__,'Dead')
+
+
+
+
 if __name__ == "__main__":
     unittest.main()
