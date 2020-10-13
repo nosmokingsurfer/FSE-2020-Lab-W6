@@ -724,13 +724,16 @@ class Dead(State):
 
 
 
+def main():
 
+    context = initialize()
 
-context = initialize()
+    for day in tqdm.tqdm(range(100)):
+        simulate_day(context)
 
-for day in tqdm.tqdm(range(100)):
-    simulate_day(context)
+    context.health_dept.data.plot()
+    print(context.health_dept.data)
+    plt.show()
 
-context.health_dept.data.plot()
-print(context.health_dept.data)
-plt.show()
+if __name__ == "__main__":
+    main()
